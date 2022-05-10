@@ -4,16 +4,16 @@ from selenium.webdriver.common.by import By
 import os
 import logging
 from Utils import download_pdf
-
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 
 log = logging.getLogger()
 log.setLevel('INFO')
 
-scriptdir = os.path.dirname(os.path.realpath(__file__))
-PATH = scriptdir+"\chromedriver.exe"
 options = Options()
 options = webdriver.ChromeOptions()
-driver = webdriver.Chrome(PATH, options=options)
+driver = webdriver.Chrome(service=Service(
+    ChromeDriverManager().install()), options=options)
 
 LINK = "https://www.strongmotioncenter.org/stationmap_worldwide/all_stations.php"
 driver.get(LINK)
