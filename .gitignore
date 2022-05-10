@@ -1,0 +1,4 @@
+/.venv
+/chromedriver.exe
+/pdfs
+/__pycache__
