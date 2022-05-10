@@ -1,9 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
 import os
 import logging
 from Utils import download_pdf
@@ -24,6 +21,16 @@ inputElement = driver.find_element(by=By.ID, value="filterText")
 
 STATION_CODE = 'CE12267'
 PDF_FOLDER = './pdfs'  # No colocar ultimo slash, es decir, no hacer ./pdfs/
+
+if not os.path.exists(PDF_FOLDER):
+    try:
+        os.makedirs(PDF_FOLDER)
+        logging.info(f"Working folder {PDF_FOLDER} created.")
+    except OSError:
+        logging.info(
+            f"Working folder {PDF_FOLDER} already created.")
+
+
 while True:
     try:
         seleccionable = driver.find_element(
