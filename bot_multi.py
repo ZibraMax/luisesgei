@@ -15,7 +15,7 @@ log = logging.getLogger()
 log.setLevel('INFO')
 
 LINK = "https://www.strongmotioncenter.org/stationmap_worldwide/all_stations.php"
-STATION_CODE = 'CE12267'  # sys.argv[1]
+STATION_CODE = sys.argv[1]
 PDF_FOLDER = './pdfs'  # No colocar ultimo slash, es decir, no hacer ./pdfs/ xd
 ZIP_FOLDER = './zips'  # No colocar ultimo slash, es decir, no hacer ./pdfs/ xd
 ZIP_FOLDER = os.path.abspath(ZIP_FOLDER)
@@ -29,7 +29,7 @@ EMAIL = open('secrets.txt').read()
 options = Options()
 options = webdriver.ChromeOptions()
 
-prefs = {"download.default_directory": f"{ZIP_FOLDER}"}
+prefs = {"download.default_directory": f"{UNZIP_FOLDER}"}
 options.add_experimental_option("prefs", prefs)
 
 driver = webdriver.Chrome(service=Service(
@@ -56,7 +56,7 @@ while True:
             by=By.XPATH, value=f"//*[text()='{STATION_CODE}']")
         break
     except Exception as e:
-        logging.debug('Volvio a iterar porque no ha cargado')
+        logging.info(f'{STATION_CODE} Volvio a iterar porque no ha cargado')
 driver.execute_script("arguments[0].click();", seleccionable)
 station_info = driver.find_element(
     by=By.XPATH, value="//u[text()='Station Information ']")
@@ -151,12 +151,12 @@ for i in tqdm(range(1, len(checkboxes)), unit=' Registro'):
     driver.execute_script("arguments[0].click();", downlink)
     driver.close()
 
-download_wait(ZIP_FOLDER, 30)  # teamo stranger
-zips = os.listdir(ZIP_FOLDER)
+download_wait(UNZIP_FOLDER, 30)  # teamo stranger
+zips = os.listdir(UNZIP_FOLDER)
 
 for f in zips:
     if '.zip' in f.lower():
-        ruta_archivo_zip = os.path.join(ZIP_FOLDER, f)
+        ruta_archivo_zip = os.path.join(UNZIP_FOLDER, f)
         with zipfile.ZipFile(ruta_archivo_zip, 'r') as zip_ref:
             zip_ref.extractall(UNZIP_FOLDER)
 

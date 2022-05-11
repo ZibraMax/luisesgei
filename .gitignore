@@ -1,4 +1,9 @@
 /.venv
-/chromedriver.exe
-/pdfs
 /__pycache__
+*.pdf
+*.V2
+*.V3
+*.V2C
+*.V3C
+*.zip
+secrets.txt
