@@ -11,7 +11,8 @@
     ```python
     python -m venv .venv
     ```
-4. Install requirements using:
+4. Activate virtual environtment
+5. Install requirements using:
     ```python
     python -m pip install -r requirements.txt
     ```

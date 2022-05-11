@@ -34,7 +34,7 @@ if not os.path.exists(PDF_FOLDER):
 while True:
     try:
         seleccionable = driver.find_element(
-            by=By.XPATH, value=F"//*[text()='{STATION_CODE}']")
+            by=By.XPATH, value=f"//*[text()='{STATION_CODE}']")
         driver.execute_script("arguments[0].click();", seleccionable)
         station_info = driver.find_element(
             by=By.XPATH, value="//u[text()='Station Information ']")
