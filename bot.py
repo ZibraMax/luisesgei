@@ -20,7 +20,7 @@ driver.get(LINK)
 inputElement = driver.find_element(by=By.ID, value="filterText")
 
 STATION_CODE = 'CE12267'
-PDF_FOLDER = './pdfs'  # No colocar ultimo slash, es decir, no hacer ./pdfs/
+PDF_FOLDER = './pdfs'  # No colocar ultimo slash, es decir, no hacer ./pdfs/ xd
 
 if not os.path.exists(PDF_FOLDER):
     try:
