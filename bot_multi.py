@@ -33,7 +33,7 @@ prefs = {"download.default_directory": f"{UNZIP_FOLDER}"}
 options.add_experimental_option("prefs", prefs)
 
 driver = webdriver.Chrome(service=Service(
-    ChromeDriverManager().install()), chrome_options=options)
+    ChromeDriverManager().install()), options=options)
 
 driver.get(LINK)
 inputElement = driver.find_element(by=By.ID, value="filterText")
@@ -56,7 +56,7 @@ while True:
             by=By.XPATH, value=f"//*[text()='{STATION_CODE}']")
         break
     except Exception as e:
-        logging.info(f'{STATION_CODE} Volvio a iterar porque no ha cargado')
+        logging.debug('Volvio a iterar porque no ha cargado')
 driver.execute_script("arguments[0].click();", seleccionable)
 station_info = driver.find_element(
     by=By.XPATH, value="//u[text()='Station Information ']")
@@ -82,76 +82,57 @@ driver.switch_to.window(driver.window_handles[1])
 rutactual = driver.current_url
 checkboxes = driver.find_elements(
     by=By.XPATH, value="//input[@type='checkbox']")
-
-p_parent = checkboxes[0].find_element(by=By.XPATH, value="./..")
-td = p_parent.find_element(by=By.XPATH, value="./..")
-tr = td.find_element(by=By.XPATH, value="./..")
-
-td_texto = tr.find_elements(by=By.XPATH, value=".//td")[7]
-texto_m = td_texto.find_element(by=By.XPATH, value=".//font").text
-
-td_texto = tr.find_elements(by=By.XPATH, value=".//td")[10]
-texto_m2 = td_texto.find_element(by=By.XPATH, value=".//font").text
-
-textos.append(f'{texto_m}_{texto_m2}')
 boton_descargar = driver.find_element(
     by=By.XPATH, value="//input[@type='SUBMIT']")
-driver.execute_script("arguments[0].click();", checkboxes[0])
 
-driver.execute_script("arguments[0].click();", boton_descargar)
+logging.info('Empezamos a descargar..')
+for i in tqdm(range(0, len(checkboxes)), unit=' Registro'):
+    try:
+        driver.switch_to.window(driver.window_handles[1])
+        if not i == 0:
+            driver.execute_script("arguments[0].click();", checkboxes[i-1])
+        driver.execute_script("arguments[0].click();", checkboxes[i])
 
-driver.switch_to.window(driver.window_handles[2])
-ruta_res = driver.current_url + "&Processed=on"
-driver.get(ruta_res)
-boton = driver.find_element(
-    by=By.XPATH, value="//input[@type='SUBMIT']")
-driver.execute_script("arguments[0].click();", boton)
-texbox_email = driver.find_element(by=By.NAME, value='email')
-texbox_email.send_keys(f'{EMAIL}')
-texbox_email.send_keys(Keys.ENTER)
+        p_parent = checkboxes[i].find_element(by=By.XPATH, value="./..")
+        td = p_parent.find_element(by=By.XPATH, value="./..")
+        tr = td.find_element(by=By.XPATH, value="./..")
+        td_texto = tr.find_elements(by=By.XPATH, value=".//td")[7]
+        texto_m = td_texto.find_element(by=By.XPATH, value=".//font").text
 
-boton = driver.find_element(
-    by=By.XPATH, value="//input[@type='button']")
-driver.execute_script("arguments[0].click();", boton)
+        td_texto = tr.find_elements(by=By.XPATH, value=".//td")[10]
+        texto_m2 = td_texto.find_element(by=By.XPATH, value=".//font").text
 
-driver.switch_to.window(driver.window_handles[2])
+        driver.execute_script("arguments[0].click();", boton_descargar)
+        driver.switch_to.window(driver.window_handles[2])
+        ruta_res = driver.current_url + "&Processed=on"
+        driver.get(ruta_res)
+        boton = driver.find_element(
+            by=By.XPATH, value="//input[@type='SUBMIT']")
+        driver.execute_script("arguments[0].click();", boton)
 
-downlink = driver.find_element(
-    by=By.XPATH, value="//a[text()='Download selected Processed data']")
-driver.execute_script("arguments[0].click();", downlink)
-driver.close()
+        if i == 0:
+            texbox_email = driver.find_element(by=By.NAME, value='email')
+            texbox_email.send_keys(f'{EMAIL}')
+            texbox_email.send_keys(Keys.ENTER)
 
+            boton = driver.find_element(
+                by=By.XPATH, value="//input[@type='button']")
+            driver.execute_script("arguments[0].click();", boton)
 
-logging.info('Empezamos a descargar como animales')
+            driver.switch_to.window(driver.window_handles[2])
 
-for i in tqdm(range(1, len(checkboxes)), unit=' Registro'):
-    driver.switch_to.window(driver.window_handles[1])
-    driver.execute_script("arguments[0].click();", checkboxes[i-1])
-    driver.execute_script("arguments[0].click();", checkboxes[i])
-
-    p_parent = checkboxes[i].find_element(by=By.XPATH, value="./..")
-    td = p_parent.find_element(by=By.XPATH, value="./..")
-    tr = td.find_element(by=By.XPATH, value="./..")
-    td_texto = tr.find_elements(by=By.XPATH, value=".//td")[7]
-    texto_m = td_texto.find_element(by=By.XPATH, value=".//font").text
-
-    td_texto = tr.find_elements(by=By.XPATH, value=".//td")[10]
-    texto_m2 = td_texto.find_element(by=By.XPATH, value=".//font").text
-    textos.append(f'{texto_m}_{texto_m2}')
-
-    driver.execute_script("arguments[0].click();", boton_descargar)
-    driver.switch_to.window(driver.window_handles[2])
-    ruta_res = driver.current_url + "&Processed=on"
-    driver.get(ruta_res)
-    boton = driver.find_element(
-        by=By.XPATH, value="//input[@type='SUBMIT']")
-    driver.execute_script("arguments[0].click();", boton)
-    downlink = driver.find_element(
-        by=By.XPATH, value="//a[text()='Download selected Processed data']")
-    driver.execute_script("arguments[0].click();", downlink)
-    driver.close()
+        downlink = driver.find_element(
+            by=By.XPATH, value="//a[text()='Download selected Processed data']")
+        driver.execute_script("arguments[0].click();", downlink)
+        driver.close()
+        textos.append(f'{texto_m}_{texto_m2}')
+    except Exception as e:
+        driver.close()
+        logging.error(
+            f"EL REGISTRO {texto_m}_{texto_m2} NO PUDO DESCARGARSE.")
 
 download_wait(UNZIP_FOLDER, 30)  # teamo stranger
+driver.quit()
 zips = os.listdir(UNZIP_FOLDER)
 
 for f in zips:
