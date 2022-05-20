@@ -11,11 +11,44 @@ from selenium.webdriver.chrome.service import Service
 from tqdm import tqdm
 import sys
 
+
+def descomprimirShit(nombre_archivo):
+    zips = os.listdir(UNZIP_FOLDER)
+
+    for f in zips:
+        if '.zip' in f.lower():
+            ruta_archivo_zip = os.path.join(UNZIP_FOLDER, f)
+            with zipfile.ZipFile(ruta_archivo_zip, 'r') as zip_ref:
+                zip_ref.extractall(UNZIP_FOLDER)
+
+            try:
+                os.remove(ruta_archivo_zip)
+            except Exception as e:
+                logging.info(f'{f} not found')
+
+    _zips = os.listdir(UNZIP_FOLDER)
+    zips = []
+    for z in _zips:
+        if '.zip' in z.lower():
+            zips.append(z)
+    for i, f in enumerate(zips):
+        ruta_archivo_zip = os.path.join(UNZIP_FOLDER, f)
+        with zipfile.ZipFile(ruta_archivo_zip, 'r') as zip_ref:
+            zip_ref.extractall(os.path.join(UNZIP_FOLDER, nombre_archivo))
+        try:
+            pass
+            os.remove(ruta_archivo_zip)
+        except Exception as e:
+            logging.info(f'{ruta_archivo_zip} not found')
+
+
 log = logging.getLogger()
 log.setLevel('INFO')
 
 LINK = "https://www.strongmotioncenter.org/stationmap_worldwide/all_stations.php"
-STATION_CODE = 'CE14606'
+STATION_CODE = 'CE24370'
+if len(sys.argv) == 2:
+    STATION_CODE = sys.argv[1]
 PDF_FOLDER = './pdfs'  # No colocar ultimo slash, es decir, no hacer ./pdfs/ xd
 ZIP_FOLDER = './zips'  # No colocar ultimo slash, es decir, no hacer ./pdfs/ xd
 ZIP_FOLDER = os.path.abspath(ZIP_FOLDER)
@@ -126,36 +159,12 @@ for i in tqdm(range(0, len(checkboxes)), unit=' Registro'):
         driver.execute_script("arguments[0].click();", downlink)
         driver.close()
         textos.append(f'{texto_m}_{texto_m2}')
+        download_wait(UNZIP_FOLDER, 30)  # teamo stranger
+        descomprimirShit(f'{texto_m}_{texto_m2}')
+        a = 0
     except Exception as e:
         driver.close()
         logging.error(
             f"EL REGISTRO {texto_m}_{texto_m2} NO PUDO DESCARGARSE.")
 
-download_wait(UNZIP_FOLDER, 30)  # teamo stranger
 driver.quit()
-zips = os.listdir(UNZIP_FOLDER)
-
-for f in zips:
-    if '.zip' in f.lower():
-        ruta_archivo_zip = os.path.join(UNZIP_FOLDER, f)
-        with zipfile.ZipFile(ruta_archivo_zip, 'r') as zip_ref:
-            zip_ref.extractall(UNZIP_FOLDER)
-
-        try:
-            os.remove(ruta_archivo_zip)
-        except Exception as e:
-            logging.info(f'{f} not found')
-
-_zips = os.listdir(UNZIP_FOLDER)
-zips = []
-for z in _zips:
-    if '.zip' in z.lower():
-        zips.append(z)
-for i, f in enumerate(zips):
-    ruta_archivo_zip = os.path.join(UNZIP_FOLDER, f)
-    with zipfile.ZipFile(ruta_archivo_zip, 'r') as zip_ref:
-        zip_ref.extractall(os.path.join(UNZIP_FOLDER, textos[i]))
-    try:
-        os.remove(ruta_archivo_zip)
-    except Exception as e:
-        logging.info(f'{ruta_archivo_zip} not found')
